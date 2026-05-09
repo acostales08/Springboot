@@ -17,71 +17,56 @@ import static com.crudapplication2.application2.utilities.Constant.*;
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
 
-    private final TaskRepository repository;
+    private final TaskRepository taskRepository;
 
     @Override
     public MSResponse addTask(TaskRequestdto request){
-        TaskEntity task = TaskEntity.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .status(request.getStatus())
-                .build();
-        repository.save(task);
-        return MSResponse.builder()
-                .status(HttpStatus.CREATED)
-                .body(RESPONSE_SUCCESS_MESSAGE)
-                .build();
+        MSResponse msResponse = new MSResponse();
+        taskRepository.save(request);
+        msResponse.setStatus(HttpStatus.CREATED);
+        msResponse.setBody(RESPONSE_SUCCESS_MESSAGE);
+        return msResponse;
     }
 
 
     @Override
-    public MSResponse updateTask(long id, TaskRequestdto request){
-        TaskEntity task = repository.findById(id).orElse(null);
-        if (task == null) {
-            return MSResponse.builder()
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(RESPONSE_NOT_FOUND)
-                    .build();
+    public MSResponse updateTask(int id, TaskRequestdto request){
+        MSResponse msResponse = new MSResponse();
+        TaskRequestdto task = taskRepository.findById(id).orElse(null);
+        if(task == null){
+            msResponse.setStatus(HttpStatus.NOT_FOUND);
+            msResponse.setBody(RESPONSE_NOT_FOUND);
         }
-        task.setTitle(request.getTitle());
-        task.setDescription(request.getDescription());
-        task.setStatus(request.getStatus());
-        repository.save(task);
-
-        return MSResponse.builder()
-                .status(HttpStatus.OK)
-                .body(RESPONSE_UPDATE_SUCCESS_MESSAGE)
-                .build();
+        taskRepository.save(request);
+        msResponse.setStatus(HttpStatus.CREATED);
+        msResponse.setBody(RESPONSE_UPDATE_SUCCESS_MESSAGE);
+        return msResponse;
     }
 
     @Override
     public MSResponse getAllTasks(){
-        List<TaskEntity> tasks = repository.findAll();
+        MSResponse msResponse = new MSResponse();
+        List<TaskRequestdto> tasks = taskRepository.findAll();
         if(tasks.isEmpty()){
-            return MSResponse.builder()
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(RESPONSE_NOT_FOUND)
-                    .build();
+            msResponse.setStatus(HttpStatus.NOT_FOUND);
+            msResponse.setBody(RESPONSE_NOT_FOUND);
         }
-        return MSResponse.builder()
-                .status(HttpStatus.NOT_FOUND)
-                .body(tasks)
-                .build();
+        msResponse.setStatus(HttpStatus.OK);
+        msResponse.setBody(tasks);
+        return msResponse;
     }
 
     @Override
-    public MSResponse deleteTask(long id){
-        TaskEntity task = repository.findById(id).orElse(null);
+    public MSResponse deleteTask(int id){
+        MSResponse msResponse = new MSResponse();
+        TaskRequestdto task = taskRepository.findById(id).orElse(null);
         if (task == null) {
-            return MSResponse.builder()
-                    .status(HttpStatus.NOT_FOUND)
-                    .body(RESPONSE_NOT_FOUND)
-                    .build();
+            msResponse.setStatus(HttpStatus.NOT_FOUND);
+            msResponse.setBody(RESPONSE_NOT_FOUND);
         }
-        repository.delete(task);
-        return MSResponse.builder()
-                .status(HttpStatus.OK)
-                .body("success")
-                .build();
+        taskRepository.delete(task);
+        msResponse.setStatus(HttpStatus.OK);
+        msResponse.setBody("success");
+        return msResponse;
     }
 }

@@ -26,7 +26,7 @@ public class TaskController {
 
     @PutMapping("/update/{id}")
     public ResponseEntity<Object> updateTask(
-            @PathVariable long id,
+            @PathVariable int id,
             @RequestBody TaskRequestdto request) {
 
         MSResponse taskResponse = taskService.updateTask(id, request);
@@ -45,7 +45,7 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Object> deleteTask(@PathVariable long id) {
+    public ResponseEntity<Object> deleteTask(@PathVariable int id) {
         MSResponse taskResponse = taskService.deleteTask(id);
         return ResponseEntity
                 .status(taskResponse.getStatus())
