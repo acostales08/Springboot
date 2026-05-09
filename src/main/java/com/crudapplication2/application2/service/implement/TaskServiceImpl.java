@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static com.crudapplication2.application2.utilities.Constant.*;
+
 @Service
 @RequiredArgsConstructor
 public class TaskServiceImpl implements TaskService {
@@ -27,7 +29,7 @@ public class TaskServiceImpl implements TaskService {
         repository.save(task);
         return MSResponse.builder()
                 .status(HttpStatus.CREATED)
-                .body("success")
+                .body(RESPONSE_SUCCESS_MESSAGE)
                 .build();
     }
 
@@ -38,7 +40,7 @@ public class TaskServiceImpl implements TaskService {
         if (task == null) {
             return MSResponse.builder()
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Task not found")
+                    .body(RESPONSE_NOT_FOUND)
                     .build();
         }
         task.setTitle(request.getTitle());
@@ -48,7 +50,7 @@ public class TaskServiceImpl implements TaskService {
 
         return MSResponse.builder()
                 .status(HttpStatus.OK)
-                .body("success")
+                .body(RESPONSE_UPDATE_SUCCESS_MESSAGE)
                 .build();
     }
 
@@ -58,7 +60,7 @@ public class TaskServiceImpl implements TaskService {
         if(tasks.isEmpty()){
             return MSResponse.builder()
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Task not found")
+                    .body(RESPONSE_NOT_FOUND)
                     .build();
         }
         return MSResponse.builder()
@@ -73,7 +75,7 @@ public class TaskServiceImpl implements TaskService {
         if (task == null) {
             return MSResponse.builder()
                     .status(HttpStatus.NOT_FOUND)
-                    .body("Task not found")
+                    .body(RESPONSE_NOT_FOUND)
                     .build();
         }
         repository.delete(task);
