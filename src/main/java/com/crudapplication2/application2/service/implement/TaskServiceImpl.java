@@ -22,9 +22,14 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public MSResponse addTask(TaskRequestdto request){
         MSResponse msResponse = new MSResponse();
-        taskRepository.save(request);
-        msResponse.setStatus(HttpStatus.CREATED);
-        msResponse.setBody(RESPONSE_SUCCESS_MESSAGE);
+        try {
+            taskRepository.save(request);
+            msResponse.setStatus(HttpStatus.CREATED);
+            msResponse.setBody(RESPONSE_SUCCESS_MESSAGE);
+        }catch (Exception e){
+            msResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            msResponse.setBody("Unexpected error occurred: " + e.getMessage());
+        }
         return msResponse;
     }
 
@@ -33,40 +38,55 @@ public class TaskServiceImpl implements TaskService {
     public MSResponse updateTask(int id, TaskRequestdto request){
         MSResponse msResponse = new MSResponse();
         TaskRequestdto task = taskRepository.findById(id).orElse(null);
-        if(task == null){
-            msResponse.setStatus(HttpStatus.NOT_FOUND);
-            msResponse.setBody(RESPONSE_NOT_FOUND);
+        try {
+            if (task == null) {
+                msResponse.setStatus(HttpStatus.NOT_FOUND);
+                msResponse.setBody(RESPONSE_NOT_FOUND);
+                return msResponse;
+            }
+            taskRepository.save(request);
+            msResponse.setStatus(HttpStatus.CREATED);
+            msResponse.setBody(RESPONSE_UPDATE_SUCCESS_MESSAGE);
+        }catch (Exception e){
+            msResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            msResponse.setBody("Unexpected error occurred: " + e.getMessage());
         }
-        taskRepository.save(request);
-        msResponse.setStatus(HttpStatus.CREATED);
-        msResponse.setBody(RESPONSE_UPDATE_SUCCESS_MESSAGE);
         return msResponse;
     }
 
     @Override
     public MSResponse getAllTasks(){
         MSResponse msResponse = new MSResponse();
-        List<TaskRequestdto> tasks = taskRepository.findAll();
-        if(tasks.isEmpty()){
-            msResponse.setStatus(HttpStatus.NOT_FOUND);
-            msResponse.setBody(RESPONSE_NOT_FOUND);
+        List<TaskRequestdto> tasks = null;
+        try{
+            tasks = taskRepository.findAll();
+            msResponse.setStatus(HttpStatus.OK);
+            msResponse.setBody(tasks);
+        }catch(Exception e){
+            e.printStackTrace();
+        }finally {
+            tasks = null;
         }
-        msResponse.setStatus(HttpStatus.OK);
-        msResponse.setBody(tasks);
         return msResponse;
     }
 
     @Override
     public MSResponse deleteTask(int id){
         MSResponse msResponse = new MSResponse();
-        TaskRequestdto task = taskRepository.findById(id).orElse(null);
-        if (task == null) {
-            msResponse.setStatus(HttpStatus.NOT_FOUND);
-            msResponse.setBody(RESPONSE_NOT_FOUND);
+        try {
+            TaskRequestdto task = taskRepository.findById(id).orElse(null);
+            if (task == null) {
+                msResponse.setStatus(HttpStatus.NOT_FOUND);
+                msResponse.setBody(RESPONSE_NOT_FOUND);
+                return msResponse;
+            }
+            taskRepository.delete(task);
+            msResponse.setStatus(HttpStatus.OK);
+            msResponse.setBody("success");
+        }catch (Exception e){
+            msResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            msResponse.setBody("Unexpected error occurred: " + e.getMessage());
         }
-        taskRepository.delete(task);
-        msResponse.setStatus(HttpStatus.OK);
-        msResponse.setBody("success");
         return msResponse;
     }
 }
