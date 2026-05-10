@@ -1,6 +1,5 @@
 package com.crudapplication2.application2.service.implement;
 
-import com.crudapplication2.application2.model.TaskEntity;
 import com.crudapplication2.application2.model.request.TaskRequestdto;
 import com.crudapplication2.application2.model.response.msResponse.MSResponse;
 import com.crudapplication2.application2.repository.TaskRepository;
@@ -44,8 +43,9 @@ public class TaskServiceImpl implements TaskService {
                 msResponse.setBody(RESPONSE_NOT_FOUND);
                 return msResponse;
             }
+            request.setId(id);
             taskRepository.save(request);
-            msResponse.setStatus(HttpStatus.CREATED);
+            msResponse.setStatus(HttpStatus.OK);
             msResponse.setBody(RESPONSE_UPDATE_SUCCESS_MESSAGE);
         }catch (Exception e){
             msResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -63,7 +63,8 @@ public class TaskServiceImpl implements TaskService {
             msResponse.setStatus(HttpStatus.OK);
             msResponse.setBody(tasks);
         }catch(Exception e){
-            e.printStackTrace();
+            msResponse.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            msResponse.setBody("Unexpected error occurred: " + e.getMessage());
         }finally {
             tasks = null;
         }
